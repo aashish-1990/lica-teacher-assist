@@ -4,4 +4,4 @@ python-dotenv
 requests
 pydub
 eventlet
-
+gunicorn
