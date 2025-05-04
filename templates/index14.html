@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LICA Teacher Assist</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6fa;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 30px;
+    }
+    .section {
+      background: white;
+      border-radius: 10px;
+      padding: 25px;
+      margin: 20px auto;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      max-width: 600px;
+    }
+    .section h2 {
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+    }
+    .speak-btn {
+      background-color: #3498db;
+      border: none;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-bottom: 15px;
+    }
+    .speak-btn:hover {
+      background-color: #2980b9;
+    }
+    .text-block {
+      text-align: left;
+      margin-top: 10px;
+      padding: 0 10px;
+    }
+    .text-block strong {
+      display: inline-block;
+      width: 90px;
+      color: #34495e;
+    }
+    .speaker-icon {
+      cursor: pointer;
+      font-size: 1.2rem;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎙️ LICA Teacher Assist</h1>
+
+  <div class="section">
+    <h2>👩‍🏫 Teacher (Hindi)</h2>
+    <button class="speak-btn" onclick="recordAndSend('teacher')">🎤 Speak</button>
+    <div class="text-block"><strong>Original:</strong> <span id="teacherOriginal"></span></div>
+    <div class="text-block">
+      <strong>Translated:</strong>
+      <span id="teacherTranslated"></span>
+      <span class="speaker-icon" onclick="playAudio('studentAudio')">🔊</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>🧑‍🎓 Student (Punjabi)</h2>
+    <button class="speak-btn" onclick="recordAndSend('student')">🎤 Speak</button>
+    <div class="text-block"><strong>Original:</strong> <span id="studentOriginal"></span></div>
+    <div class="text-block">
+      <strong>Translated:</strong>
+      <span id="studentTranslated"></span>
+      <span class="speaker-icon" onclick="playAudio('teacherAudio')">🔊</span>
+    </div>
+  </div>
+
+  <!-- Hidden audio players -->
+  <audio id="teacherAudio" hidden></audio>
+  <audio id="studentAudio" hidden></audio>
+
+  <script>
+    function recordAndSend(role) {
+      navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+        const mediaRecorder = new MediaRecorder(stream);
+        const audioChunks = [];
+
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(audioChunks, { type: 'audio/wav' });
+          const reader = new FileReader();
+
+          reader.onloadend = () => {
+            const base64data = reader.result;
+
+            fetch('/translate_play', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ role, audio: base64data })
+            })
+            .then(response => response.json())
+            .then(data => {
+              const original = data.original || '';
+              const translated = data.translated || '';
+              const audioSrc = `data:audio/wav;base64,${data.audio || ''}`;
+
+              if (role === 'teacher') {
+                document.getElementById('teacherOriginal').textContent = original;
+                document.getElementById('teacherTranslated').textContent = translated;
+                const studentAudio = document.getElementById('studentAudio');
+                studentAudio.src = audioSrc;
+                studentAudio.play();
+              } else {
+                document.getElementById('studentOriginal').textContent = original;
+                document.getElementById('studentTranslated').textContent = translated;
+                const teacherAudio = document.getElementById('teacherAudio');
+                teacherAudio.src = audioSrc;
+                teacherAudio.play();
+              }
+            });
+          };
+
+          reader.readAsDataURL(blob);
+        };
+
+        mediaRecorder.start();
+        setTimeout(() => mediaRecorder.stop(), 3000);
+      });
+    }
+
+    function playAudio(audioId) {
+      const audio = document.getElementById(audioId);
+      if (audio && audio.src) {
+        audio.play();
+      }
+    }
+  </script>
+</body>
+</html>
+

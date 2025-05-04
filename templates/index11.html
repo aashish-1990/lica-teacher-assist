@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LICA Teacher Assist</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f7f9fc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin: 1.5rem 0;
+      color: #2c3e50;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      padding: 2rem;
+      margin: 1rem auto;
+      width: 90%;
+      max-width: 600px;
+    }
+    .card h2 {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background-color: #3498db;
+      color: white;
+      margin-bottom: 1rem;
+      transition: background-color 0.3s;
+    }
+    .btn:hover {
+      background-color: #2980b9;
+    }
+    .label {
+      font-weight: 600;
+      color: #333;
+    }
+    .text-muted {
+      color: #555;
+      margin-bottom: 0.75rem;
+    }
+    audio {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎤 LICA Teacher Assist</h1>
+
+  <div class="card">
+    <h2>👩‍🏫 Teacher (Hindi)</h2>
+    <button class="btn" onclick="startRecording('teacher')">🎤 Speak</button>
+    <p class="label">Original:</p>
+    <p class="text-muted" id="teacher-original">...</p>
+    <p class="label">Translated:</p>
+    <p class="text-muted" id="teacher-translated">...</p>
+    <audio id="teacher-audio" autoplay></audio>
+  </div>
+
+  <div class="card">
+    <h2>👨‍🏫 Student (Punjabi)</h2>
+    <button class="btn" onclick="startRecording('student')">🎤 Speak</button>
+    <p class="label">Original:</p>
+    <p class="text-muted" id="student-original">...</p>
+    <p class="label">Translated:</p>
+    <p class="text-muted" id="student-translated">...</p>
+    <audio id="student-audio" autoplay></audio>
+  </div>
+
+  <script>
+    let mediaRecorder;
+    let audioChunks = [];
+
+    async function startRecording(role) {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.start();
+
+      audioChunks = [];
+      mediaRecorder.addEventListener("dataavailable", event => {
+        audioChunks.push(event.data);
+      });
+
+      mediaRecorder.addEventListener("stop", async () => {
+        const audioBlob = new Blob(audioChunks);
+        const reader = new FileReader();
+        reader.readAsDataURL(audioBlob);
+        reader.onloadend = async () => {
+          const base64Audio = reader.result;
+          const response = await fetch("/translate_play", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ audio: base64Audio, role })
+          });
+          const result = await response.json();
+          if (role === "teacher") {
+            document.getElementById("teacher-original").textContent = result.original;
+            document.getElementById("teacher-translated").textContent = result.translated;
+            document.getElementById("student-audio").src = "data:audio/wav;base64," + result.audio;
+          } else {
+            document.getElementById("student-original").textContent = result.original;
+            document.getElementById("student-translated").textContent = result.translated;
+            document.getElementById("teacher-audio").src = "data:audio/wav;base64," + result.audio;
+          }
+        };
+      });
+
+      setTimeout(() => {
+        mediaRecorder.stop();
+      }, 4000);
+    }
+  </script>
+</body>
+</html>
+
