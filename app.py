@@ -6,7 +6,7 @@ import os
 import tempfile
 import requests
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='public', static_url_path='')
 
 # Configuration
 API_KEY = os.getenv('SARVAM_API_KEY')
@@ -61,6 +61,12 @@ def translate_play():
         'translated': translated_text,
         'audio': audio_out_b64
     })
+
+# Serve frontend static assets
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_frontend(path):
+    return app.send_static_file('index.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)
