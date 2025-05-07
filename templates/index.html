@@ -5,7 +5,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>🎙️ LICA Teacher Assist</title>
-  <!-- Tailwind CDN -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 font-sans leading-normal">
@@ -13,28 +13,25 @@
     <!-- Header -->
     <header class="flex items-center justify-between mb-8">
       <h1 class="text-3xl font-bold">🎙️ LICA Teacher Assist</h1>
-      <select id="langSelect" class="border rounded px-2 py-1">
-        <option value="hi-pa">Hindi ↔ Punjabi</option>
-        <option value="hi-te">Hindi ↔ Telugu</option>
-      </select>
+      
     </header>
 
     <!-- Panels -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Teacher Panel -->
-      <section id="teacherPanel" class="bg-white p-6 rounded-lg shadow">
+      <section class="bg-white p-6 rounded-lg shadow">
         <h2 class="text-xl font-semibold mb-4"><span role="img">👩‍🏫</span> Teacher (Hindi)</h2>
         <button id="teacherSpeak" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">🎙️ Speak</button>
-        <div id="teacherWave" class="mt-4 h-16 bg-gray-200 rounded"></div>
+        <div class="mt-4 h-16 bg-gray-200 rounded"></div>
         <label class="block mt-4 font-medium">You Said:</label>
         <div id="teacherOriginal" class="mt-2 text-gray-700 min-h-[2rem]">—</div>
       </section>
 
       <!-- Student Panel -->
-      <section id="studentPanel" class="bg-white p-6 rounded-lg shadow">
+      <section class="bg-white p-6 rounded-lg shadow">
         <h2 class="text-xl font-semibold mb-4"><span role="img">🧑‍🎓</span> Student (Punjabi)</h2>
         <button id="studentSpeak" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">🎙️ Speak</button>
-        <div id="studentWave" class="mt-4 h-16 bg-gray-200 rounded"></div>
+        <div class="mt-4 h-16 bg-gray-200 rounded"></div>
         <label class="block mt-4 font-medium">You Said:</label>
         <div id="studentOriginal" class="mt-2 text-gray-700 min-h-[2rem]">—</div>
       </section>
@@ -47,8 +44,9 @@
     </footer>
   </div>
 
-  <!-- App Logic -->
+  <!-- App Logic: full absolute API URL -->
   <script>
+    const API_BASE = 'https://lica-teacher-assist.onrender.com';
     const teacherBtn = document.getElementById('teacherSpeak');
     const studentBtn = document.getElementById('studentSpeak');
     const statusBar = document.getElementById('statusBar');
@@ -56,14 +54,14 @@
     const teacherOrig = document.getElementById('teacherOriginal');
     const studentOrig = document.getElementById('studentOriginal');
 
-    teacherBtn.addEventListener('click', () => runFlow('teacher'));
-    studentBtn.addEventListener('click', () => runFlow('student'));
+    teacherBtn.onclick = () => runFlow('teacher');
+    studentBtn.onclick = () => runFlow('student');
 
     async function runFlow(role) {
       statusBar.textContent = '🔴 Recording 5s…';
       const start = performance.now();
 
-      // Record 5 seconds
+      // 1) Record audio
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
       const chunks = [];
@@ -71,25 +69,29 @@
       recorder.start();
       await new Promise(r => setTimeout(r, 5000));
       recorder.stop();
-      await new Promise(resolve => recorder.onstop = resolve);
-      const audioBlob = new Blob(chunks, { type: 'audio/wav' });
+      await new Promise(r => recorder.onstop = r);
+      const blob = new Blob(chunks, { type: 'audio/wav' });
       const reader = new FileReader();
-      const audioB64 = await new Promise(res => {
-        reader.onloadend = () => res(reader.result);
-        reader.readAsDataURL(audioBlob);
+      const audioDataUrl = await new Promise(res => {
+        reader.onloadend = () => res(reader.result.split(',')[1]);
+        reader.readAsDataURL(blob);
       });
 
       statusBar.textContent = '⏳ Processing…';
-
-      // Call unified backend endpoint
-      const res = await fetch('/translate_play', {
+      // 2) Call unified endpoint with absolute URL
+      const resp = await fetch(`${API_BASE}/translate_play`, {
         method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ role, audio: audioB64 })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role, audio: audioDataUrl })
       });
-      const { original, translated, audio, target_box } = await res.json();
+      if (!resp.ok) {
+        statusBar.textContent = '❌ Error';
+        console.error('API error', resp.status, await resp.text());
+        return;
+      }
+      const { original, translated, audio } = await resp.json();
 
-      // Display original and translation
+      // 3) Display
       if (role === 'teacher') {
         teacherOrig.textContent = original;
         studentOrig.textContent = translated;
@@ -98,13 +100,13 @@
         teacherOrig.textContent = translated;
       }
 
-      // Play returned TTS audio
-      const audioUrl = 'data:audio/wav;base64,' + audio;
-      const sound = new Audio(audioUrl);
-      await sound.play();
+      // 4) Play
+      const player = new Audio(`data:audio/wav;base64,${audio}`);
+      await player.play();
 
+      // 5) Latency
       const total = Math.round(performance.now() - start);
-      latencyEl.textContent = total + ' ms';
+      latencyEl.textContent = `${total} ms`;
       statusBar.textContent = '✅ Ready';
     }
   </script>
