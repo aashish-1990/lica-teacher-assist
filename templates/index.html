@@ -1,52 +1,38 @@
-<!-- public/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>🎙️ LICA Teacher Assist</title>
-  <!-- Tailwind CSS -->
+  <title>LICA Teacher Assist</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 font-sans leading-normal">
   <div class="max-w-4xl mx-auto p-6">
-    <!-- Header -->
     <header class="flex items-center justify-between mb-8">
-      <h1 class="text-3xl font-bold">🎙️ LICA Teacher Assist</h1>
-      
+      <h1 class="text-3xl font-bold">LICA Teacher Assist</h1>
     </header>
-
-    <!-- Panels -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Teacher Panel -->
       <section class="bg-white p-6 rounded-lg shadow">
-        <h2 class="text-xl font-semibold mb-4"><span role="img">👩‍🏫</span> Teacher (Hindi)</h2>
-        <button id="teacherSpeak" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">🎙️ Speak</button>
+        <h2 class="text-xl font-semibold mb-4">Teacher (Hindi)</h2>
+        <button id="teacherSpeak" class="bg-blue-500 text-white px-4 py-2 rounded">Speak</button>
         <div class="mt-4 h-16 bg-gray-200 rounded"></div>
         <label class="block mt-4 font-medium">You Said:</label>
         <div id="teacherOriginal" class="mt-2 text-gray-700 min-h-[2rem]">—</div>
       </section>
-
-      <!-- Student Panel -->
       <section class="bg-white p-6 rounded-lg shadow">
-        <h2 class="text-xl font-semibold mb-4"><span role="img">🧑‍🎓</span> Student (Punjabi)</h2>
-        <button id="studentSpeak" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">🎙️ Speak</button>
+        <h2 class="text-xl font-semibold mb-4">Student (Punjabi)</h2>
+        <button id="studentSpeak" class="bg-green-500 text-white px-4 py-2 rounded">Speak</button>
         <div class="mt-4 h-16 bg-gray-200 rounded"></div>
         <label class="block mt-4 font-medium">You Said:</label>
         <div id="studentOriginal" class="mt-2 text-gray-700 min-h-[2rem]">—</div>
       </section>
     </div>
-
-    <!-- Status Bar -->
-    <footer class="mt-8 bg-white p-4 rounded-lg shadow flex justify-between items-center">
+    <footer class="mt-8 bg-white p-4 rounded-lg shadow flex justify-between">
       <div id="statusBar" class="text-gray-600">Status: Ready</div>
-      <div class="text-gray-600">Latency: <span id="latency">0ms</span></div>
+      <div class="text-gray-600">Latency: <span id="latency">0 ms</span></div>
     </footer>
   </div>
-
-  <!-- App Logic: full absolute API URL -->
   <script>
-    const API_BASE = 'https://lica-teacher-assist.onrender.com';
     const teacherBtn = document.getElementById('teacherSpeak');
     const studentBtn = document.getElementById('studentSpeak');
     const statusBar = document.getElementById('statusBar');
@@ -58,13 +44,13 @@
     studentBtn.onclick = () => runFlow('student');
 
     async function runFlow(role) {
-      statusBar.textContent = '🔴 Recording 5s…';
+      statusBar.textContent = 'Recording…';
       const start = performance.now();
 
-      // 1) Record audio
+      // Record
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
-      const chunks = [];
+      let chunks = [];
       recorder.ondataavailable = e => chunks.push(e.data);
       recorder.start();
       await new Promise(r => setTimeout(r, 5000));
@@ -72,26 +58,20 @@
       await new Promise(r => recorder.onstop = r);
       const blob = new Blob(chunks, { type: 'audio/wav' });
       const reader = new FileReader();
-      const audioDataUrl = await new Promise(res => {
+      const audioData = await new Promise(res => {
         reader.onloadend = () => res(reader.result.split(',')[1]);
         reader.readAsDataURL(blob);
       });
 
-      statusBar.textContent = '⏳ Processing…';
-      // 2) Call unified endpoint with absolute URL
-      const resp = await fetch(`${API_BASE}/translate_play`, {
+      statusBar.textContent = 'Processing…';
+      const resp = await fetch('/translate_play', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role, audio: audioDataUrl })
+        body: JSON.stringify({ role, audio: audioData })
       });
-      if (!resp.ok) {
-        statusBar.textContent = '❌ Error';
-        console.error('API error', resp.status, await resp.text());
-        return;
-      }
+      if (!resp.ok) throw new Error('API error');
       const { original, translated, audio } = await resp.json();
 
-      // 3) Display
       if (role === 'teacher') {
         teacherOrig.textContent = original;
         studentOrig.textContent = translated;
@@ -100,14 +80,13 @@
         teacherOrig.textContent = translated;
       }
 
-      // 4) Play
+      statusBar.textContent = 'Playing…';
       const player = new Audio(`data:audio/wav;base64,${audio}`);
       await player.play();
 
-      // 5) Latency
       const total = Math.round(performance.now() - start);
       latencyEl.textContent = `${total} ms`;
-      statusBar.textContent = '✅ Ready';
+      statusBar.textContent = 'Ready';
     }
   </script>
 </body>
