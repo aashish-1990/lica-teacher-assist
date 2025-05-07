@@ -4,14 +4,15 @@ import base64
 import requests
 from dotenv import load_dotenv
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='public', static_url_path='')
 load_dotenv()
 API_KEY = os.getenv("SARVAM_API_KEY")
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_frontend(path):
+    return app.send_static_file('index.html')
+    
 @app.route('/translate_play', methods=['POST'])
 def translate_play():
     data = request.get_json()
