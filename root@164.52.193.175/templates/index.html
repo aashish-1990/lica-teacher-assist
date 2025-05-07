@@ -1,92 +1,114 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2299.7">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000; min-height: 14.0px}
-    span.s1 {font-kerning: none}
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🎙️ LICA Teacher Assist</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
-<p class="p1"><span class="s1">&lt;html lang="en"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;head&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8" /&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"/&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;title&gt;Teacher-Student Bilingual Voice App&lt;/title&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;style&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>body {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>font-family: sans-serif; padding: 1rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>max-width: 600px; margin: auto;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>button {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>padding: 1rem; font-size: 1rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>width: 100%; margin-top: 1rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.log {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>background: #f4f4f4; padding: 1rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin-top: 1rem; border-radius: 5px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
-<p class="p1"><span class="s1">&lt;body&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;h2&gt;🎤 Bilingual Voice Translator (Sarvam)&lt;/h2&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;select id="role"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;option value="teacher"&gt;Teacher (Hindi to Punjabi)&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;option value="student"&gt;Student (Punjabi to Hindi)&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/select&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;button onclick="startRecording()"&gt;🎙️ Record &amp; Translate&lt;/button&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="log" id="result"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;b&gt;Transcript:&lt;/b&gt; &lt;span id="transcript"&gt;-&lt;/span&gt;&lt;br&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;b&gt;Translated:&lt;/b&gt; &lt;span id="translated"&gt;-&lt;/span&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;script&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>async function startRecording() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const btn = document.querySelector("button");</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>btn.disabled = true;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>btn.innerText = "Recording...";</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const stream = await navigator.mediaDevices.getUserMedia({ audio: true });</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const mediaRecorder = new MediaRecorder(stream);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>let chunks = [];</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>mediaRecorder.ondataavailable = e =&gt; chunks.push(e.data);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>mediaRecorder.onstop = async () =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const blob = new Blob(chunks, { type: 'audio/wav' });</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>const reader = new FileReader();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>reader.onloadend = async () =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>const b64 = reader.result;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>const role = document.getElementById("role").value;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>const res = await fetch("/translate_play", {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>method: "POST",</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>headers: { "Content-Type": "application/json" },</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>body: JSON.stringify({ audio: b64, role })</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>});</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>const data = await res.json();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>document.getElementById("transcript").innerText = data.original || "-";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>document.getElementById("translated").innerText = data.translated || "-";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>btn.innerText = "🎙️ Record &amp; Translate";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>btn.disabled = false;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>};</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>reader.readAsDataURL(blob);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>};</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>mediaRecorder.start();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>setTimeout(() =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>mediaRecorder.stop();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>stream.getTracks().forEach(t =&gt; t.stop());</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>}, 5000);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
+<body class="bg-gray-100 font-sans leading-normal">
+  <div class="max-w-4xl mx-auto p-6">
+    <!-- Header -->
+    <header class="flex items-center justify-between mb-8">
+      <h1 class="text-3xl font-bold">🎙️ LICA Teacher Assist</h1>
+      
+    </header>
+
+    <!-- Panels -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Teacher Panel -->
+      <section class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-xl font-semibold mb-4"><span role="img">👩‍🏫</span> Teacher (Hindi)</h2>
+        <button id="teacherSpeak" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">🎙️ Speak</button>
+        <div class="mt-4 h-16 bg-gray-200 rounded"></div>
+        <label class="block mt-4 font-medium">You Said:</label>
+        <div id="teacherOriginal" class="mt-2 text-gray-700 min-h-[2rem]">—</div>
+      </section>
+
+      <!-- Student Panel -->
+      <section class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-xl font-semibold mb-4"><span role="img">🧑‍🎓</span> Student (Punjabi)</h2>
+        <button id="studentSpeak" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">🎙️ Speak</button>
+        <div class="mt-4 h-16 bg-gray-200 rounded"></div>
+        <label class="block mt-4 font-medium">You Said:</label>
+        <div id="studentOriginal" class="mt-2 text-gray-700 min-h-[2rem]">—</div>
+      </section>
+    </div>
+
+    <!-- Status Bar -->
+    <footer class="mt-8 bg-white p-4 rounded-lg shadow flex justify-between items-center">
+      <div id="statusBar" class="text-gray-600">Status: Ready</div>
+      <div class="text-gray-600">Latency: <span id="latency">0ms</span></div>
+    </footer>
+  </div>
+
+  <!-- App Logic: full absolute API URL -->
+  <script>
+    const API_BASE = 'https://lica-teacher-assist.onrender.com';
+    const teacherBtn = document.getElementById('teacherSpeak');
+    const studentBtn = document.getElementById('studentSpeak');
+    const statusBar = document.getElementById('statusBar');
+    const latencyEl = document.getElementById('latency');
+    const teacherOrig = document.getElementById('teacherOriginal');
+    const studentOrig = document.getElementById('studentOriginal');
+
+    teacherBtn.onclick = () => runFlow('teacher');
+    studentBtn.onclick = () => runFlow('student');
+
+    async function runFlow(role) {
+      statusBar.textContent = '🔴 Recording 5s…';
+      const start = performance.now();
+
+      // 1) Record audio
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const chunks = [];
+      recorder.ondataavailable = e => chunks.push(e.data);
+      recorder.start();
+      await new Promise(r => setTimeout(r, 5000));
+      recorder.stop();
+      await new Promise(r => recorder.onstop = r);
+      const blob = new Blob(chunks, { type: 'audio/wav' });
+      const reader = new FileReader();
+      const audioDataUrl = await new Promise(res => {
+        reader.onloadend = () => res(reader.result.split(',')[1]);
+        reader.readAsDataURL(blob);
+      });
+
+      statusBar.textContent = '⏳ Processing…';
+      // 2) Call unified endpoint with absolute URL
+      const resp = await fetch(`${API_BASE}/translate_play`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role, audio: audioDataUrl })
+      });
+      if (!resp.ok) {
+        statusBar.textContent = '❌ Error';
+        console.error('API error', resp.status, await resp.text());
+        return;
+      }
+      const { original, translated, audio } = await resp.json();
+
+      // 3) Display
+      if (role === 'teacher') {
+        teacherOrig.textContent = original;
+        studentOrig.textContent = translated;
+      } else {
+        studentOrig.textContent = original;
+        teacherOrig.textContent = translated;
+      }
+
+      // 4) Play
+      const player = new Audio(`data:audio/wav;base64,${audio}`);
+      await player.play();
+
+      // 5) Latency
+      const total = Math.round(performance.now() - start);
+      latencyEl.textContent = `${total} ms`;
+      statusBar.textContent = '✅ Ready';
+    }
+  </script>
 </body>
 </html>
