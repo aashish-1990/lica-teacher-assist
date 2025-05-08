@@ -58,6 +58,7 @@ def translate_play():
     }
     translate_payload = {
         'model': 'mayura:v1',
+        'input': transcript,
         'source_language_code': 'hi-IN' if role == 'teacher' else 'pa-IN',
         'target_language_code': 'pa-IN' if role == 'teacher' else 'hi-IN',
         'text': transcript
