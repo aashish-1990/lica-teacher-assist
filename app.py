@@ -1,9 +1,21 @@
 from flask import Flask, request, jsonify
-import os, base64, io, requests
+import os, base64, io, requests, logging
 from dotenv import load_dotenv
 
 # Initialize Flask app to serve static files from 'templates'
 app = Flask(__name__, static_folder='templates', static_url_path='')
+
+# Send DEBUG logs to stdout
+logging.basicConfig(level=logging.DEBUG)
+# Flask’s own logger
+app.logger.setLevel(logging.DEBUG)
+# Gunicorn’s logger (if you need it)
+if 'gunicorn.error' in logging.root.manager.loggerDict:
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    gunicorn_logger.setLevel(logging.DEBUG)
+# ————————————————————————
+
+
 load_dotenv()
 API_KEY = os.getenv("SARVAM_API_KEY")
 
