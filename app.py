@@ -8,9 +8,9 @@ load_dotenv()
 API_KEY = os.getenv("SARVAM_API_KEY")
 
 # Sarvam API endpoints
-STT_URL = 'https://api.sarvam.ai/speech-to-text/transcribe'
-TRANSLATE_URL = 'https://api.sarvam.ai/text/translate'
-TTS_URL = 'https://api.sarvam.ai/text-to-speech/convert'
+STT_URL = 'https://api.sarvam.ai/speech-to-text'
+TRANSLATE_URL = 'https://api.sarvam.ai/translate'
+TTS_URL = 'https://api.sarvam.ai/text-to-speech'
 
 # Serve frontend static files
 @app.route('/', defaults={'path': ''})
@@ -43,7 +43,7 @@ def translate_play():
     }
     stt_data = {
         'model': 'saarika:v2',
-        'language': 'hi-IN' if role == 'teacher' else 'pa-IN'
+        'language_code': 'hi-IN' if role == 'teacher' else 'pa-IN'
     }
     stt_resp = requests.post(STT_URL, headers=stt_headers, files=stt_files, data=stt_data)
     if not stt_resp.ok:
