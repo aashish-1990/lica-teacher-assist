@@ -84,7 +84,7 @@ def translate_play():
         return jsonify({'error': 'Translate failed', 'detail': translate_resp.text}), 502
     translated_text = translate_resp.json().get('translation', '')
 
-    app.logger.debug("Translate response [%s]: %s", translate_resp.status_code, translate_resp.text)
+    app.logger.debug("Translate response [%s]: %s, %s, %s", translate_resp.status_code, translate_resp.text, translated_text, translate_resp.json())
     
     # 3) Text-to-Speech (TTS)
     tts_headers = {
