@@ -13,7 +13,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/translate_play', methods=['POST'])
-def translate_and_play():
+def translate_play():
     data = request.get_json()
     role = data.get('role')
     audio_b64 = data.get('audio')
