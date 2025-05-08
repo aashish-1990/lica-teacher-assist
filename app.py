@@ -34,7 +34,7 @@ def translate_play():
     # STT
     stt_files = {'file': ('input.wav', io.BytesIO(audio_bytes), 'audio/wav')}
     stt_headers = {'API-Subscription-Key': API_KEY}
-    stt_data = {'model': 'saarikav2', 'language_code': 'hi-IN' if role=='teacher' else 'pa-IN'}
+    stt_data = {'model': 'saarika:v2', 'language_code': 'hi-IN' if role=='teacher' else 'pa-IN'}
     stt_resp = requests.post(STT_URL, headers=stt_headers, files=stt_files, data=stt_data)
     stt_resp.raise_for_status()
     transcript = stt_resp.json().get('transcript', '')
@@ -43,7 +43,7 @@ def translate_play():
     src, tgt = ('hi-IN','pa-IN') if role=='teacher' else ('pa-IN','hi-IN')
     tr_files = {'file': ('input.wav', io.BytesIO(audio_bytes), 'audio/wav')}
     tr_headers = {'API-Subscription-Key': API_KEY}
-    tr_data = {'model': 'saarikav2', 'target_language_code': tgt}
+    tr_data = {'model': 'mayura:v1', 'target_language_code': tgt}
     tr_resp = requests.post(STT_TURL, headers=tr_headers, files=tr_files, data=tr_data)
     tr_resp.raise_for_status()
     translated = tr_resp.json().get('transcript', '')
