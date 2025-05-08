@@ -42,7 +42,7 @@ def translate_play():
         'Accept': 'application/json'
     }
     stt_data = {
-        'model': 'saarika:v2',
+        'model': 'saarika_v2',
         'language': 'hi-IN' if role == 'teacher' else 'pa-IN'
     }
     stt_resp = requests.post(STT_URL, headers=stt_headers, files=stt_files, data=stt_data)
@@ -57,7 +57,7 @@ def translate_play():
         'Accept': 'application/json'
     }
     translate_payload = {
-        'model': 'mayura:v1',
+        'model': 'mayura_v1',
         'source_language_code': 'hi-IN' if role == 'teacher' else 'pa-IN',
         'target_language_code': 'pa-IN' if role == 'teacher' else 'hi-IN',
         'text': transcript
@@ -74,7 +74,7 @@ def translate_play():
         'Accept': 'application/json'
     }
     tts_payload = {
-        'model': 'bulbul:v2',
+        'model': 'bulbul_v2',
         'text': translated_text,
         'target_language_code': 'pa-IN' if role == 'teacher' else 'hi-IN',
         'speaker': 'anushka' if role == 'teacher' else 'karun',
