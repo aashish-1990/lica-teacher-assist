@@ -21,6 +21,7 @@ def serve_frontend(path):
 # Unified translate and play endpoint
 @app.route('/translate_play', methods=['POST'])
 def translate_play():
+    app.logger.debug("Incoming /translate_play request: %s", request.get_json())
     data = request.get_json(force=True)
     role = data.get('role')
     audio_b64 = data.get('audio')
@@ -35,6 +36,8 @@ def translate_play():
     except Exception as e:
         return jsonify({'error': 'Invalid Base64 audio', 'detail': str(e)}), 400
 
+    app.logger.debug("Decoded audio bytes: %d bytes", len(audio_bytes))
+    
     # 1) Speech-to-Text (STT)
     stt_files = {'file': ('input.wav', io.BytesIO(audio_bytes), 'audio/wav')}
     stt_headers = {
@@ -49,7 +52,8 @@ def translate_play():
     if not stt_resp.ok:
         return jsonify({'error': 'STT failed', 'detail': stt_resp.text}), 502
     transcript = stt_resp.json().get('transcript', '')
-
+    app.logger.debug("STT response [%s]: %s", stt_resp.status_code, stt_resp.text)
+    
     # 2) Text Translate
     translate_headers = {
         'API-Subscription-Key': API_KEY,
@@ -68,6 +72,8 @@ def translate_play():
         return jsonify({'error': 'Translate failed', 'detail': translate_resp.text}), 502
     translated_text = translate_resp.json().get('translation', '')
 
+    app.logger.debug("Translate response [%s]: %s", translate_resp.status_code, translate_resp.text)
+    
     # 3) Text-to-Speech (TTS)
     tts_headers = {
         'API-Subscription-Key': API_KEY,
@@ -88,6 +94,8 @@ def translate_play():
     if not audio_b64_list:
         return jsonify({'error': 'No audio returned'}), 500
     audio_out_b64 = audio_b64_list[0]
+
+    app.logger.debug("TTS response [%s]: %s", tts_resp.status_code, tts_resp.text)
 
     # Return combined response
     return jsonify({
