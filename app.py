@@ -9,8 +9,8 @@ API_KEY = os.getenv("SARVAM_API_KEY")
 
 # Sarvam API endpoints
 STT_URL = 'https://api.sarvam.ai/speech-to-text'
-TRANSLATE_URL = 'https://api.sarvam.ai/translate'
-TTS_URL = 'https://api.sarvam.ai/text-to-speech'
+TRANSLATE_URL = 'https://api.sarvam.ai/text/translate'
+TTS_URL = 'https://api.sarvam.ai/text-to-speech/convert'
 
 # Serve frontend static files
 @app.route('/', defaults={'path': ''})
@@ -25,25 +25,22 @@ def translate_play():
     role = data.get('role')
     audio_b64 = data.get('audio')
 
-    # Validate input
+    # Validate request
     if not API_KEY or role not in ('teacher', 'student') or not audio_b64:
-        return jsonify({'error': 'Missing or invalid role/audio'}), 400
+        return jsonify({'error': 'Missing or invalid role or audio'}), 400
 
-    # Decode audio from Base64
+    # Decode Base64 audio
     try:
         audio_bytes = base64.b64decode(audio_b64)
     except Exception as e:
-        return jsonify({'error': 'Invalid Base64 audio', 'detail': str(e)}), 400
+        return jsonify({'error': 'Invalid base64 audio', 'detail': str(e)}), 400
 
-    # 1) Speech-to-Text (STT)
+    # 1) Speech-to-Text
     stt_files = {'file': ('input.wav', io.BytesIO(audio_bytes), 'audio/wav')}
-    stt_headers = {
-        'API-Subscription-Key': API_KEY,
-        'Accept': 'application/json'
-    }
+    stt_headers = {'API-Subscription-Key': API_KEY, 'Accept': 'application/json'}
     stt_data = {
         'model': 'saarika:v2',
-        'language_code': 'hi-IN' if role == 'teacher' else 'pa-IN'
+        'language': 'hi-IN' if role == 'teacher' else 'pa-IN'
     }
     stt_resp = requests.post(STT_URL, headers=stt_headers, files=stt_files, data=stt_data)
     if not stt_resp.ok:
@@ -51,29 +48,20 @@ def translate_play():
     transcript = stt_resp.json().get('transcript', '')
 
     # 2) Text Translate
-    translate_headers = {
-        'API-Subscription-Key': API_KEY,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-    }
+    translate_headers = {'API-Subscription-Key': API_KEY, 'Content-Type': 'application/json', 'Accept': 'application/json'}
     translate_payload = {
         'model': 'mayura:v1',
         'input': transcript,
         'source_language_code': 'hi-IN' if role == 'teacher' else 'pa-IN',
-        'target_language_code': 'pa-IN' if role == 'teacher' else 'hi-IN',
-        'text': transcript
+        'target_language_code': 'pa-IN' if role == 'teacher' else 'hi-IN'
     }
     translate_resp = requests.post(TRANSLATE_URL, headers=translate_headers, json=translate_payload)
     if not translate_resp.ok:
         return jsonify({'error': 'Translate failed', 'detail': translate_resp.text}), 502
     translated_text = translate_resp.json().get('translation', '')
 
-    # 3) Text-to-Speech (TTS)
-    tts_headers = {
-        'API-Subscription-Key': API_KEY,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-    }
+    # 3) Text-to-Speech
+    tts_headers = {'API-Subscription-Key': API_KEY, 'Content-Type': 'application/json', 'Accept': 'application/json'}
     tts_payload = {
         'model': 'bulbul:v2',
         'text': translated_text,
@@ -84,17 +72,12 @@ def translate_play():
     tts_resp = requests.post(TTS_URL, headers=tts_headers, json=tts_payload)
     if not tts_resp.ok:
         return jsonify({'error': 'TTS failed', 'detail': tts_resp.text}), 502
-    audio_b64_list = tts_resp.json().get('audios', [])
-    if not audio_b64_list:
+    audio_list = tts_resp.json().get('audios', [])
+    if not audio_list:
         return jsonify({'error': 'No audio returned'}), 500
-    audio_out_b64 = audio_b64_list[0]
+    audio_out_b64 = audio_list[0]
 
-    # Return combined response
-    return jsonify({
-        'original': transcript,
-        'translated': translated_text,
-        'audio': audio_out_b64
-    })
+    return jsonify({'original': transcript, 'translated': translated_text, 'audio': audio_out_b64})
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
