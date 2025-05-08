@@ -82,7 +82,7 @@ def translate_play():
     translate_resp = requests.post(TRANSLATE_URL, headers=translate_headers, json=translate_payload)
     if not translate_resp.ok:
         return jsonify({'error': 'Translate failed', 'detail': translate_resp.text}), 502
-    translated_text = translate_resp.json().get('translation', '')
+    translated_text = translate_resp.json().get('translated_text', '')
 
     app.logger.debug("Translate response [%s]: %s, %s, %s", translate_resp.status_code, translate_resp.text, translated_text, translate_resp.json())
     
