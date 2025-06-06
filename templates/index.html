@@ -32,14 +32,23 @@
       <div class="text-gray-600">Latency: <span id="latency">0 ms</span></div>
     </footer>
     <!-- Instructions block added below -->
-    <div class="mt-2 text-sm text-red-600">
-      To see bi-directional communication do the following:<br>
-      1. Press ‘Teacher Speak’ button<br>
-      2. Say something in Hindi for max 5 seconds<br>
-      3. Wait for 5-6 seconds after which you should hear a punjabi translated version on the ‘student’ side<br>
-      4. Then press the student ‘Speak’ button and say something in Punjabi to see the reverse translation happening on the teacher side
+    <div class="mt-6 bg-gray-100 p-5 rounded-lg shadow border border-gray-200">
+      <div class="text-base font-semibold text-black mb-2">How to Use Bi-directional Communication:</div>
+      <ol class="list-decimal pl-6 space-y-2 text-black">
+        <li>
+          Press the <span class="font-medium">'Teacher Speak'</span> button.
+        </li>
+        <li>
+          Say something in Hindi (maximum 5 seconds).
+        </li>
+        <li>
+          Wait for 5–6 seconds. You should hear a Punjabi translated version on the <span class="font-medium">'Student'</span> side.
+        </li>
+        <li>
+          Then press the <span class="font-medium">'Student Speak'</span> button and say something in Punjabi to see the reverse translation on the teacher side.
+        </li>
+      </ol>
     </div>
-  </div>
   <script>
     const teacherBtn = document.getElementById('teacherSpeak');
     const studentBtn = document.getElementById('studentSpeak');
